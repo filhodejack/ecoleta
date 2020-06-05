@@ -1,12 +1,12 @@
 import React from 'react';
 import './App.css';
+import Header from './Header'
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>Hello, world!</h1>
-      </header>
+      <Header title="Hello, otherworldly!" />
+      <h1>Conteúdo da aplicação</h1>
     </div>
   );
 }
