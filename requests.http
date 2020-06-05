@@ -1,0 +1,85 @@
+### List items
+http://localhost:3333/items
+
+### Should result in a bad request
+POST http://localhost:3333/points HTTP/1.1
+
+{
+  "name": "Imperial Market",
+  "email": "contato@example.com",
+  "whatsapp": "+12 12 123 456 789",
+  "lat": 2.599789,
+  "long": 55.123777,
+  "city": "Imperial",
+  "uf": "IM",
+  "items": [1, 2, 6]
+}
+
+### Item 101 does not exist, some error must return
+POST http://localhost:3333/points HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Imperial Market",
+  "email": "contato@example.com",
+  "whatsapp": "+12 12 123 456 789",
+  "lat": 2.599789,
+  "long": 55.123777,
+  "city": "Imperial",
+  "uf": "IM",
+  "items": [1, 2, 101]
+}
+
+### Add a new point with success
+POST http://localhost:3333/points HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Imperial Market",
+  "email": "contato@example.com",
+  "whatsapp": "+12 12 123 456 789",
+  "lat": 2.599789,
+  "long": 55.123777,
+  "city": "Imperial",
+  "uf": "IM",
+  "items": [1, 2, 6]
+}
+
+### Add a new point with success
+POST http://localhost:3333/points HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Ooccaa",
+  "email": "contato@example.com",
+  "whatsapp": "+12 12 123 456 789",
+  "lat": 2.599789,
+  "long": 55.123777,
+  "city": "Imperial",
+  "uf": "IM",
+  "items": [6]
+}
+
+### Another one
+POST http://localhost:3333/points HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Via Rodeo",
+  "email": "rodeoprincipal@example.com",
+  "whatsapp": "123456789",
+  "lat": 27.599789,
+  "long": 19.123777,
+  "city": "Rodeo City",
+  "uf": "RC",
+  "items": [6]
+}
+
+### Show a point
+http://localhost:3333/points/1
+
+### Query a point
+http://localhost:3333/points?city=Imperial&uf=IM&items=1,2
+
+### Query a point
+http://localhost:3333/points?city=Imperial&uf=IM&items=6
