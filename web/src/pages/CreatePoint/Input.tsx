@@ -1,6 +1,7 @@
 import React from "react";
+import FieldProps from "./FieldProps";
 
-const Input = (props: any) => {
+const Input = (props: FieldProps) => {
   let result;
   let count = 0;
 
