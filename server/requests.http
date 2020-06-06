@@ -83,3 +83,6 @@ http://localhost:3333/points?city=Imperial&uf=IM&items=1,2
 
 ### Query a point
 http://localhost:3333/points?city=Imperial&uf=IM&items=6
+
+###
+https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome

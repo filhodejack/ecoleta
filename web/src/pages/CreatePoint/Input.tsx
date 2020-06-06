@@ -7,11 +7,16 @@ const Input = (props: FieldProps) => {
   switch (props.type) {
     case "select":
       result = (
-        <select id={props.id || props.name} name={props.name}>
-          <option value="">Escolha uma opção</option>
-          {props.values?.map((value: string) => (
-            <option key={value} value={value}>
-              {value}
+        <select
+          id={props.id || props.name}
+          name={props.name}
+          onChange={props.onChange}
+          value={props.value}
+        >
+          <option value={props.value}>Escolha uma opção</option>
+          {props.options?.map((option: string) => (
+            <option key={option} value={option}>
+              {option}
             </option>
           ))}
         </select>

@@ -8,9 +8,11 @@ const Field = (props: FieldProps) => (
     <Input
       id={props.id || props.name}
       name={props.name}
+      onChange={props.onChange}
+      options={props.options}
       title={props.title}
       type={props.type}
-      values={props.values}
+      value={props.value}
     />
   </div>
 );
