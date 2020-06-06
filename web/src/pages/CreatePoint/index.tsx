@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "../Header";
 import CollectItems from "./CollectItems";
+import CollectPointMap from "./CollectPointMap";
 import Field from "./Field";
 import Legend from "./Legend";
 import "./style.css";
@@ -59,6 +60,7 @@ const CreatePoint = () => {
 
         <fieldset>
           <Legend title="Endereço" details="Selecione o endereço no mapa" />
+          <CollectPointMap />
           <div className="field-group">
             <Field name="uf" title="Estado (UF)" type="select" values={uf} />
             <Field name="cidade" title="Cidade" type="select" values={uf} />
