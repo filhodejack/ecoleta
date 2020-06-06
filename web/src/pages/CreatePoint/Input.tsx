@@ -3,21 +3,17 @@ import FieldProps from "./FieldProps";
 
 const Input = (props: FieldProps) => {
   let result;
-  let count = 0;
-
-  const values = props.values?.map((value: string) => {
-    count += 1;
-    return <option value={count}>{value}</option>;
-  });
 
   switch (props.type) {
     case "select":
       result = (
         <select id={props.id || props.name} name={props.name}>
-          <option value="0" selected>
-            Escolha uma opção
-          </option>
-          {values}
+          <option value="">Escolha uma opção</option>
+          {props.values?.map((value: string) => (
+            <option key={value} value={value}>
+              {value}
+            </option>
+          ))}
         </select>
       );
       break;

@@ -1,5 +1,5 @@
-import { Map, TileLayer, Marker, Popup } from "react-leaflet";
 import React from "react";
+import { Map, Marker, TileLayer } from "react-leaflet";
 
 const CollectPointMap = () => (
   <Map center={[-20, -46]} zoom={15}>

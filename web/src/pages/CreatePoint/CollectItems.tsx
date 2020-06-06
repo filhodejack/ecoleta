@@ -1,32 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import api from "../../services/api";
 
-const CollectItems = () => (
-  <ul className="items-grid">
-    <li>
-      <img src="http://localhost:3333/uploads/oleo.svg" alt="Teste" />
-      <span>Óleo de Cozinha</span>
-    </li>
-    <li>
-      <img src="http://localhost:3333/uploads/oleo.svg" alt="Teste" />
-      <span>Óleo de Cozinha</span>
-    </li>
-    <li>
-      <img src="http://localhost:3333/uploads/oleo.svg" alt="Teste" />
-      <span>Óleo de Cozinha</span>
-    </li>
-    <li>
-      <img src="http://localhost:3333/uploads/oleo.svg" alt="Teste" />
-      <span>Óleo de Cozinha</span>
-    </li>
-    <li>
-      <img src="http://localhost:3333/uploads/oleo.svg" alt="Teste" />
-      <span>Óleo de Cozinha</span>
-    </li>
-    <li>
-      <img src="http://localhost:3333/uploads/oleo.svg" alt="Teste" />
-      <span>Óleo de Cozinha</span>
-    </li>
-  </ul>
-);
+type Item = {
+  id: number;
+  title: string;
+  image_url: string;
+};
+
+const CollectItems = () => {
+  const [items, setItems] = useState<Item[]>([]);
+
+  useEffect(() => {
+    api.get("items").then((resp) => {
+      setItems(resp.data);
+    });
+  }, []);
+
+  return (
+    <ul className="items-grid">
+      {items.map((item) => (
+        <li key={item.id}>
+          <img src={item.image_url} alt={item.title} />
+          <span>{item.title}</span>
+        </li>
+      ))}
+    </ul>
+  );
+};
 
 export default CollectItems;
