@@ -1,8 +1,10 @@
-import { Feather as Icon } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import Constants from "expo-constants";
+import * as Location from "expo-location";
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Image,
   SafeAreaView,
   StyleSheet,
@@ -21,21 +23,29 @@ type Item = {
   image_url: string;
 };
 
+type Point = {
+  id: number;
+  image: string;
+  name: string;
+  lat: number;
+  long: number;
+};
+
 const Points = () => {
   const navigation = useNavigation();
-  const initialCoordinates: LatLng = { latitude: -27.209, longitude: -49.64 };
+  const defaultPosition: LatLng = { latitude: 0, longitude: 0 };
+  const [initialPosition, setInitialPosition] = useState<LatLng>(
+    defaultPosition
+  );
   const initialRegion: Region = {
-    latitude: initialCoordinates.latitude,
+    latitude: initialPosition.latitude,
     latitudeDelta: 0.014,
-    longitude: initialCoordinates.longitude,
+    longitude: initialPosition.longitude,
     longitudeDelta: 0.014,
-  };
-  const imageSource = {
-    uri:
-      "https://media-cdn.tripadvisor.com/media/photo-s/15/d3/c2/93/popular-market.jpg",
   };
   const [items, setItems] = useState<Item[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [points, setPoints] = useState<Point[]>([]);
 
   useEffect(() => {
     api.get("items").then((resp) => {
@@ -43,12 +53,38 @@ const Points = () => {
     });
   }, []);
 
+  useEffect(() => {
+    async function loadPosition() {
+      const { status } = await Location.requestPermissionsAsync();
+
+      if (status !== "granted") {
+        Alert.alert(
+          "Eita...",
+          "Precisamos de sua permissão para obter sua localização."
+        );
+      }
+
+      const location = await Location.getCurrentPositionAsync();
+      const { latitude, longitude } = location.coords;
+
+      setInitialPosition({ latitude, longitude });
+    }
+
+    loadPosition();
+  }, []);
+
+  useEffect(() => {
+    api.get("points").then((response) => {
+      setPoints(response.data);
+    });
+  }, []);
+
   function handleNavigateBack() {
     navigation.goBack();
   }
 
-  function handleNavigateToDetail() {
-    navigation.navigate("Detail");
+  function handleNavigateToDetail(id: number) {
+    navigation.navigate("Detail", { point_id: id });
   }
 
   function handleSelectItem(id: number) {
@@ -65,7 +101,7 @@ const Points = () => {
     <SafeAreaView style={styles.safeAreaView}>
       <View style={styles.container}>
         <TouchableOpacity onPress={handleNavigateBack}>
-          <Icon name="arrow-left" size={20} color="#34cb79" />
+          <Feather name="arrow-left" size={20} color="#34cb79" />
         </TouchableOpacity>
 
         <Text style={styles.title}>😉 Bem vindo.</Text>
@@ -75,19 +111,32 @@ const Points = () => {
         </Text>
 
         <View style={styles.mapContainer}>
-          <MapView initialRegion={initialRegion} style={styles.map}>
-            <Marker
-              coordinate={initialCoordinates}
-              onPress={handleNavigateToDetail}
-            >
-              <View style={styles.mapMarkerContainer}>
-                <Image source={imageSource} style={styles.mapMarkerImage} />
+          {initialPosition.latitude !== defaultPosition.latitude && (
+            <MapView initialRegion={initialRegion} style={styles.map}>
+              {points.map((point) => (
+                <Marker
+                  coordinate={{ latitude: point.lat, longitude: point.long }}
+                  key={String(point.id)}
+                  onPress={() => handleNavigateToDetail(point.id)}
+                  style={styles.mapMarker}
+                >
+                  <View style={styles.mapMarkerContainer}>
+                    <Image
+                      source={{ uri: point.image }}
+                      style={styles.mapMarkerImage}
+                    />
 
-                <Text style={styles.mapMarkerTitle}>Mercado</Text>
-              </View>
-              <Icon name="arrow-down" size={20} style={styles.iconArrowDown} />
-            </Marker>
-          </MapView>
+                    <Text style={styles.mapMarkerTitle}>{point.name}</Text>
+                  </View>
+                  <Feather
+                    name="arrow-down"
+                    size={20}
+                    style={styles.iconArrowDown}
+                  />
+                </Marker>
+              ))}
+            </MapView>
+          )}
         </View>
       </View>
 
@@ -153,7 +202,7 @@ const styles = StyleSheet.create({
 
   mapMarker: {
     width: 90,
-    height: 80,
+    height: 100,
   },
 
   mapMarkerContainer: {
