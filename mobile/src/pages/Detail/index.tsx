@@ -1,7 +1,7 @@
 import { Feather, FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import Constants from "expo-constants";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Image,
   SafeAreaView,
@@ -18,6 +18,8 @@ const Detail = () => {
     uri:
       "https://media-cdn.tripadvisor.com/media/photo-s/15/d3/c2/93/popular-market.jpg",
   };
+
+  useEffect(() => {}, []);
 
   function handleNavigateBack() {
     navigation.goBack();
