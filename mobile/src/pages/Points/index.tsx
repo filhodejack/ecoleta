@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Constants from "expo-constants";
 import * as Location from "expo-location";
 import React, { useEffect, useState } from "react";
@@ -31,6 +31,11 @@ type Point = {
   long: number;
 };
 
+type Params = {
+  uf: string;
+  city: string;
+};
+
 const Points = () => {
   const navigation = useNavigation();
   const defaultPosition: LatLng = { latitude: 0, longitude: 0 };
@@ -46,6 +51,8 @@ const Points = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [points, setPoints] = useState<Point[]>([]);
+  const route = useRoute();
+  const routeParams = route.params as Params;
 
   useEffect(() => {
     api.get("items").then((resp) => {
@@ -74,10 +81,19 @@ const Points = () => {
   }, []);
 
   useEffect(() => {
-    api.get("points").then((response) => {
-      setPoints(response.data);
-    });
-  }, []);
+    api
+      .get("points", {
+        params: {
+          city: routeParams.city,
+          uf: routeParams.uf,
+          items: selectedItems,
+        },
+      })
+      .then((response) => {
+        setPoints(response.data);
+        console.log(routeParams, response.data);
+      });
+  }, [selectedItems]);
 
   function handleNavigateBack() {
     navigation.goBack();
