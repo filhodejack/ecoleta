@@ -28,6 +28,7 @@ const Input = (props: FieldProps) => {
         <input
           id={props.id || props.name}
           name={props.name}
+          onChange={props.onChange}
           type={props.type}
         />
       );

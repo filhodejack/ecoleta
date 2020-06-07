@@ -1,25 +1,25 @@
-import axios from "axios";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEventHandler, useEffect, useState } from "react";
 import Field from "./Field";
+import axios from "axios";
 
-type Estado = {
+export type Estado = {
   sigla: string;
 };
 
-type Municipio = {
+export type Municipio = {
   nome: string;
 };
 
-const CityAndState = () => {
+const CityAndState = (props: {
+  selectedState: string;
+  handleSelectUf: ChangeEventHandler;
+  handleSelectCity: ChangeEventHandler;
+}) => {
   const [states, setStates] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
-  const initialState = "";
-  const initialCity = "";
-  const [selectedState, setSelectedState] = useState(initialState);
-  const [selectedCity, setSelectedCity] = useState(initialCity);
   const ibgeBaseUrl = "https://servicodados.ibge.gov.br/api/v1/localidades";
   const ibgeEstadosUrl = `${ibgeBaseUrl}/estados`;
-  const ibgeMunicipiosUrl = `${ibgeBaseUrl}/estados/${selectedState}/municipios`;
+  const ibgeMunicipiosUrl = `${ibgeBaseUrl}/estados/${props.selectedState}/municipios`;
   const ibgeConfig = { params: { orderBy: "nome" } };
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const CityAndState = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedState === initialState) {
+    if (props.selectedState === "") {
       return;
     }
 
@@ -38,30 +38,20 @@ const CityAndState = () => {
       const cityNames = resp.data.map((city) => city.nome);
       setCities(cityNames);
     });
-  }, [selectedState]);
-
-  function handleSelectUf(event: ChangeEvent<HTMLSelectElement>) {
-    const uf = event.target.value;
-    setSelectedState(uf);
-  }
-
-  function handleSelectCity(event: ChangeEvent<HTMLSelectElement>) {
-    const city = event.target.value;
-    setSelectedCity(city);
-  }
+  }, [props.selectedState]);
 
   return (
     <div className="field-group">
       <Field
         name="uf"
-        onChange={handleSelectUf}
+        onChange={props.handleSelectUf}
         options={states}
         title="Estado (UF)"
         type="select"
       />
       <Field
         name="cidade"
-        onChange={handleSelectCity}
+        onChange={props.handleSelectCity}
         options={cities}
         title="Cidade"
         type="select"

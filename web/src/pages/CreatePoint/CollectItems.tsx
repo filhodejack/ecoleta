@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, MouseEventHandler } from "react";
 import api from "../../services/api";
 
 type Item = {
@@ -7,7 +7,12 @@ type Item = {
   image_url: string;
 };
 
-const CollectItems = () => {
+type CollectItemsProps = {
+  selectedItems: number[];
+  onClick: Function;
+};
+
+const CollectItems = (props: CollectItemsProps) => {
   const [items, setItems] = useState<Item[]>([]);
 
   useEffect(() => {
@@ -19,7 +24,11 @@ const CollectItems = () => {
   return (
     <ul className="items-grid">
       {items.map((item) => (
-        <li key={item.id}>
+        <li
+          className={props.selectedItems.includes(item.id) ? "selected" : ""}
+          key={item.id}
+          onClick={() => props.onClick(item.id)}
+        >
           <img src={item.image_url} alt={item.title} />
           <span>{item.title}</span>
         </li>

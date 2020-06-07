@@ -75,6 +75,9 @@ Content-Type: application/json
   "items": [6]
 }
 
+### Show poinst
+http://localhost:3333/points
+
 ### Show a point
 http://localhost:3333/points/1
 
