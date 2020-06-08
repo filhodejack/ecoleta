@@ -1,32 +1,25 @@
 import { Request, Response } from 'express'
 import knex from '../database/connection'
-import Knex from 'knex'
 
 class PointsController {
   async index(req: Request, res: Response) {
     const { city, uf, items } = req.query
     const parsedItems = String(items)
       .split(',')
-      .map(item => Number(item.trim()))
-    
-    let points: Knex
+      .map((item) => Number(item.trim()))
+    const points = await knex('points')
+      .join('point_items', 'points.id', '=', 'point_items.point_id')
+      .whereIn('point_items.item_id', parsedItems)
+      .where('city', String(city))
+      .where('uf', String(uf))
+      .distinct()
+      .select('points.*')
+    const serializedPoints = points.map((point) => ({
+      ...point,
+      image: `${getUrl(req)}/uploads/${point.image}`,
+    }))
 
-    if (!city && !uf && !items) {
-      points = await knex('points')
-        .join('point_items', 'points.id', '=', 'point_items.point_id')
-        .distinct()
-        .select('points.*')
-    } else {
-      points = await knex('points')
-        .join('point_items', 'points.id', '=', 'point_items.point_id')
-        .whereIn('point_items.item_id', parsedItems)
-        .where('city', String(city))
-        .where('uf', String(uf))
-        .distinct()
-        .select('points.*')
-    }
-
-    return res.json(points)
+    return res.json(serializedPoints)
   }
 
   async show(req: Request, res: Response) {
@@ -37,39 +30,26 @@ class PointsController {
       return res.status(400).json({ message: 'Point not found' })
     }
 
+    const serializedPoints = {
+      ...point,
+      image: `${getUrl(req)}/uploads/${point.image}`,
+    }
     const items = await knex('items')
       .join('point_items', 'items.id', '=', 'point_items.item_id')
       .where('point_items.point_id', id)
+      .select('items.title')
 
-    return res.json({ point, items })
+    return res.json({ point: serializedPoints, items })
   }
 
   async create(req: Request, res: Response) {
-    const contentTypeIsJson = req.headers["content-type"]?.includes('json')
-
-    if (!contentTypeIsJson) {
-      return res.status(400).json({
-        success: false,
-        details: 'Content-Type must be JSON.'
-      })
-    }
-
-    const {
-      name,
-      email,
-      whatsapp,
-      lat,
-      long,
-      city,
-      uf,
-      items,
-    } = req.body
-
+    const { name, email, whatsapp, lat, long, city, uf, items } = req.body
     const trx = await knex.transaction()
 
     try {
+      const filename = req.file.filename
       const point = {
-        image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60',
+        image: filename,
         name,
         email,
         whatsapp,
@@ -80,12 +60,15 @@ class PointsController {
       }
       const insertedIds = await trx('points').insert(point)
       const point_id = insertedIds[0]
-      const pointItems = items.map((item_id: number) => {
-        return {
-          item_id,
-          point_id,
-        }
-      })
+      const pointItems = items
+        .split(',')
+        .map((item: string) => Number(item.trim()))
+        .map((item_id: number) => {
+          return {
+            item_id,
+            point_id,
+          }
+        })
 
       await trx('point_items').insert(pointItems)
       await trx.commit()
@@ -93,7 +76,7 @@ class PointsController {
       return res.json({
         id: point_id,
         ...point,
-        items: pointItems
+        items: pointItems,
       })
     } catch (e) {
       await trx.rollback()
@@ -103,4 +86,9 @@ class PointsController {
   }
 }
 
+function getUrl(req: Request) {
+  return req.protocol + '://' + req.get('host')
+}
+
 export default PointsController
+
